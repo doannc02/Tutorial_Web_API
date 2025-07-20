@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vòng Đời & Tạo API ASP.NET Core Web API cho Người Mới Bắt Đầu</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        h1 {
+            font-size: 2.8em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e6ec;
+        }
+        h2 {
+            font-size: 2.2em;
+            color: #34495e;
+            margin-top: 40px;
+            border-left: 6px solid #4a90e2;
+            padding-left: 15px;
+            text-align: left;
+        }
+        h3 {
+            font-size: 1.6em;
+            color: #555;
+            margin-top: 30px;
+            text-align: left;
+        }
+        h4 {
+            font-size: 1.3em;
+            color: #4a90e2;
+            margin-top: 25px;
+            text-align: left;
+        }
+        .section-description {
+            margin-bottom: 20px;
+            color: #555;
+            text-align: left;
+        }
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.95em;
+            overflow-x: auto;
+            margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border-left: 5px solid #61afef;
+        }
+        .code-block code {
+            display: block;
+            white-space: pre-wrap;
+        }
+        .highlight {
+            color: #c678dd; /* Purple */
+        }
+        .comment {
+            color: #5c6370; /* Gray */
+        }
+        .keyword {
+            color: #e06c75; /* Reddish */
+        }
+        .string {
+            color: #98c379; /* Green */
+        }
+        .number {
+            color: #d19a66; /* Orange */
+        }
+        .diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 40px 0;
+            gap: 15px;
+        }
+        .stage {
+            background: #e9ecef;
+            border: 2px solid #adb5bd;
+            border-radius: 8px;
+            padding: 15px 25px;
+            text-align: center;
+            font-weight: bold;
+            color: #343a40;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-width: 250px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .stage:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .arrow {
+            font-size: 2em;
+            color: #4a90e2;
+            animation: bounce 1s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        ul li {
+            background: #f8f9fa;
+            margin-bottom: 10px;
+            padding: 12px 20px;
+            border-left: 4px solid #4a90e2;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        ul li strong {
+            color: #34495e;
+        }
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 8px;
+            color: #664d03;
+        }
+        .step-by-step {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .step {
+            background: #e6f3ff;
+            border: 1px solid #a8d5ff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .step strong {
+            color: #1a73e8;
+            font-size: 1.1em;
+        }
+        .rest-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .method-box {
+            background: #e9f5e9;
+            border-left: 5px solid #4CAF50;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        .method-box.get { border-left-color: #2196F3; background: #e3f2fd; }
+        .method-box.post { border-left-color: #FFC107; background: #fffde7; }
+        .method-box.put { border-left-color: #9C27B0; background: #f3e5f5; }
+        .method-box.delete { border-left-color: #F44336; background: #ffebee; }
+        .method-box h4 {
+            text-align: left;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Vòng Đời & Tạo API ASP.NET Core Web API</h1>
+        <p class="section-description" style="text-align: center;">
+            Chào mừng bạn đến với thế giới của Web API! Hướng dẫn này sẽ giúp bạn hiểu rõ cách một ứng dụng ASP.NET Core Web API hoạt động từ A đến Z, và cách xây dựng một API đơn giản.
+        </p>
+
+        ---
+
+        <h2>Phần 1: Hiểu Vòng Đời Ứng Dụng ASP.NET Core Web API</h2>
+        <p class="section-description">
+            Một ứng dụng Web API trong ASP.NET Core không chỉ là code của bạn. Nó là một hệ thống phức tạp với nhiều "bánh răng" quay cùng nhau. Hãy xem cách một yêu cầu (request) từ trình duyệt hoặc ứng dụng khác được xử lý từ đầu đến cuối.
+        </p>
+
+        <h3>1.1. Sơ Đồ Tổng Quan Vòng Đời</h3>
+        <p class="section-description">
+            Hãy hình dung một yêu cầu HTTP (ví dụ: khi bạn gõ một địa chỉ web hoặc click một nút trên ứng dụng) đi qua các tầng của ứng dụng Web API của bạn:
+        </p>
+        
+        <div class="diagram">
+            <div class="stage">Browser/Client Gửi HTTP Request (Yêu cầu)</div>
+            <span class="arrow">⬇️</span>
+            <div class="stage">Kestrel/IIS (Server) Nhận Request</div>
+            <span class="arrow">⬇️</span>
+            <div class="stage">Middleware Pipeline Bắt Đầu</div>
+            <span class="arrow">⬇️</span>
+            <div class="stage">UseHttpsRedirection() <br> (Chuyển hướng an toàn)</div>
+            <span class="arrow">⬇️</span>
+            <div class="stage">UseRouting() <br> (Tìm đường cho Request)</div>
+            <span class="arrow">⬇️</span>
+            <div class="stage">UseCors() <br> (Kiểm tra nguồn gốc Request)</div>
+            <span class="arrow">⬇️</span>
+            <div class="stage">UseAuthentication() <br> (Xác định bạn là ai)</div>
+            <span class="arrow">⬇️</span>
+            <div class="stage">UseAuthorization() <br> (Bạn có quyền làm gì?)</div>
+            <span class="arrow">⬇️</span>
+            <div class="stage">MapControllers() <br> (Chuyển Request đến Controller/Action cụ thể)</div>
+            <span class="arrow">⬇️</span>
+            <div class="stage">Action Method Thực Thi <br> (Code nghiệp vụ của bạn chạy)</div>
+            <span class="arrow">⬆️</span>
+            <div class="stage">Phản hồi (Response) đi ngược qua Middleware</div>
+            <span class="arrow">⬆️</span>
+            <div class="stage">Phản hồi HTTP về Client</div>
+        </div>
+
+        <h3>1.2. Giải Thích Chi Tiết Từng Giai Đoạn</h3>
+
+        <h4>1.2.1. Khởi Tạo Host (File Program.cs)</h4>
+        <p class="section-description">
+            Đây là "trái tim" của ứng dụng ASP.NET Core, nơi mọi thứ bắt đầu. Khi bạn chạy ứng dụng, file <code>Program.cs</code> sẽ được thực thi đầu tiên. Nó giống như việc bạn khởi động một nhà máy, chuẩn bị các máy móc và dây chuyền sản xuất.
+        </p>
+        <ul>
+            <li>
+                <strong><code>var builder = WebApplication.CreateBuilder(args);</code></strong>: Dòng này tạo ra một đối tượng <code>WebApplicationBuilder</code>. Đối tượng này là "người xây dựng" giúp bạn cấu hình mọi thứ cho ứng dụng của mình, từ việc đăng ký các dịch vụ (services) đến thiết lập pipeline xử lý yêu cầu (middleware).
+            </li>
+            <li>
+                <strong>Đăng ký Services vào DI Container (<code>builder.Services...</code>)</strong>:
+                <ul>
+                    <li>
+                        ASP.NET Core sử dụng một hệ thống gọi là **Dependency Injection (DI)** (Tiêm phụ thuộc). Hãy tưởng tượng bạn có một chiếc xe (ứng dụng của bạn) và nó cần bánh xe, động cơ, ghế ngồi (các service). Thay vì chiếc xe tự đi tìm và lắp ráp từng thứ, một "nhà máy" (DI Container) sẽ cung cấp và lắp sẵn những thứ đó cho chiếc xe khi nó được tạo ra.
+                    </li>
+                    <li>
+                        Bạn đăng ký các dịch vụ (ví dụ: dịch vụ đọc ghi database, dịch vụ gửi email, dịch vụ ghi log) vào DI Container tại đây. Điều này giúp code của bạn **linh hoạt hơn**, **dễ kiểm thử hơn** và **ít phụ thuộc** vào nhau hơn.
+                    </li>
+                    <li>
+                        Bạn cũng cấu hình **vòng đời (lifetime)** cho mỗi service:
+                        <ul>
+                            <li>
+                                <strong><span class="emoji">✨</span> Transient (<code>builder.Services.AddTransient&lt;IMyService, MyService&gt;();</code>)</strong>: Giống như một cái đĩa giấy dùng một lần. Mỗi khi một thành phần (Controller, Service khác) yêu cầu service này, một **instance (thể hiện) mới hoàn toàn** sẽ được tạo ra.
+                            </li>
+                            <li>
+                                <strong><span class="emoji">🔄</span> Scoped (<code>builder.Services.AddScoped&lt;IMyService, MyService&gt;();</code>)</strong>: Giống như một suất ăn được phục vụ riêng cho mỗi khách hàng. Một **instance duy nhất** được tạo ra **cho mỗi HTTP Request**. Trong suốt quá trình xử lý của một yêu cầu, tất cả các thành phần yêu cầu service này đều sẽ nhận được cùng một instance đó. Khi request kết thúc, instance này cũng bị hủy. Thường dùng cho database context.
+                            </li>
+                            <li>
+                                <strong><span class="emoji">👑</span> Singleton (<code>builder.Services.AddSingleton&lt;IMyService, MyService&gt;();</code>)</strong>: Giống như một tòa nhà duy nhất. Chỉ có **một instance duy nhất** được tạo ra **cho toàn bộ vòng đời của ứng dụng**. Tất cả các request và thành phần đều chia sẻ cùng một instance này. Thường dùng cho các dịch vụ không giữ trạng thái (stateless) và cần hiệu suất cao như caching hoặc logging.
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        **Cấu hình CORS (<code>builder.Services.AddCors(...)</code>)**:
+                        <ul>
+                            <li>
+                                **CORS** (Cross-Origin Resource Sharing) là một cơ chế bảo mật trên trình duyệt web. Nó quy định xem một trang web (ví dụ: website frontend của bạn chạy ở `http://localhost:3000`) có được phép truy cập tài nguyên từ một nguồn gốc khác (ví dụ: API của bạn chạy ở `https://localhost:5001`) hay không.
+                            </li>
+                            <li>
+                                Bạn định nghĩa "chính sách" CORS ở đây, liệt kê những nguồn gốc nào (tên miền/URL) được phép truy cập API của bạn, và chúng được phép sử dụng các phương thức HTTP nào (GET, POST, PUT, DELETE) hay các headers nào.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong><code>var app = builder.Build();</code></strong>: Sau khi bạn đã "khai báo" và cấu hình tất cả các service, dòng này sẽ xây dựng ứng dụng web của bạn, sẵn sàng để định nghĩa các bước xử lý yêu cầu.
+            </li>
+            <li>
+                **Cấu hình Middleware Pipeline (<code>app.Use...()</code>)**:
+                <ul>
+                    <li>
+                        **Middleware** là các thành phần phần mềm nhỏ được sắp xếp theo một thứ tự nhất định, tạo thành một "đường ống" (pipeline) xử lý yêu cầu. Khi một yêu cầu HTTP đến, nó sẽ đi qua từng Middleware một. Mỗi Middleware có thể thực hiện một tác vụ cụ thể (ví dụ: ghi log, xác thực, ủy quyền, nén dữ liệu) trước khi chuyển yêu cầu cho Middleware tiếp theo.
+                    </li>
+                    <li>
+                        **Thứ tự của Middleware là CỰC KỲ QUAN TRỌNG!** Nếu bạn đặt sai thứ tự, ứng dụng của bạn có thể không hoạt động đúng hoặc gặp lỗi bảo mật.
+                    </li>
+                </ul>
+            </li>
+            <li>
+                **<code>app.Run();</code>**: Đây là dòng cuối cùng trong file `Program.cs`, nó khởi động máy chủ web (mặc định là Kestrel) và bắt đầu lắng nghe các yêu cầu HTTP đến.
+            </li>
+        </ul>
+
+        <div class="code-block">
+            <pre><code><span class="comment">// Program.cs</span>
+<span class="keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+<span class="comment">// --- Đăng ký Services vào DI Container ---</span>
+builder.Services.<span class="highlight">AddControllers</span>(); <span class="comment">// Thêm dịch vụ cho phép dùng Controllers để xử lý API</span>
+builder.Services.<span class="highlight">AddEndpointsApiExplorer</span>(); <span class="comment">// Hỗ trợ Swagger để tạo tài liệu API tự động</span>
+builder.Services.<span class="highlight">AddSwaggerGen</span>(); <span class="comment">// Đăng ký Swagger để hiển thị tài liệu API</span>
+
+<span class="comment">// --- Cấu hình CORS ---</span>
+builder.Services.<span class="highlight">AddCors</span>(options =>
+{
+    options.<span class="highlight">AddDefaultPolicy</span>(
+        policy =>
+        {
+            policy.<span class="highlight">WithOrigins</span>(<span class="string">"http://localhost:3000"</span>, <span class="string">"https://my-frontend-app.com"</span>) <span class="comment">// Cho phép các nguồn gốc này truy cập</span>
+                  .<span class="highlight">AllowAnyHeader</span>()    <span class="comment">// Cho phép bất kỳ header nào (Content-Type, Authorization, ...)</span>
+                  .<span class="highlight">AllowAnyMethod</span>();   <span class="comment">// Cho phép tất cả các phương thức HTTP (GET, POST, PUT, DELETE)</span>
+        });
+});
+
+<span class="keyword">var</span> app = builder.<span class="highlight">Build</span>();
+
+<span class="comment">// --- Cấu hình Middleware Pipeline ---</span>
+<span class="comment">// Thứ tự này là khuyến nghị cho hầu hết các ứng dụng Web API</span>
+<span class="keyword">if</span> (app.Environment.<span class="highlight">IsDevelopment</span>()) <span class="comment">// Chỉ bật Swagger trong môi trường phát triển</span>
+{
+    app.<span class="highlight">UseSwagger</span>();
+    app.<span class="highlight">UseSwaggerUI</span>();
+}
+
+app.<span class="highlight">UseHttpsRedirection</span>(); <span class="comment">// Tự động chuyển hướng yêu cầu từ HTTP sang HTTPS (quan trọng cho bảo mật)</span>
+
+app.<span class="highlight">UseRouting</span>(); <span class="comment">// Middleware này quyết định Request sẽ đi đến "đường" nào (URL nào)</span>
+
+app.<span class="highlight">UseCors</span>(); <span class="comment">// Middleware này áp dụng chính sách CORS đã cấu hình. PHẢI SAU UseRouting()!</span>
+
+app.<span class="highlight">UseAuthentication</span>(); <span class="comment">// Middleware này xác định danh tính người dùng (đăng nhập)</span>
+app.<span class="highlight">UseAuthorization</span>();  <span class="comment">// Middleware này kiểm tra quyền của người dùng đã xác định</span>
+
+app.<span class="highlight">MapControllers</span>(); <span class="comment">// Middleware này "kết nối" Request với các Action Method trong Controller của bạn</span>
+
+app.<span class="highlight">Run</span>(); <span class="comment">// Chạy ứng dụng và lắng nghe các Request
+</code></pre>
+        </div>
+        <div class="note">
+            <strong>Tầm quan trọng của Thứ tự Middleware:</strong> <br>
+            Hãy nhớ rằng thứ tự các <code>app.Use...()</code> trong <code>Program.cs</code> là cực kỳ quan trọng. Mỗi middleware sẽ xử lý request và truyền nó cho middleware tiếp theo. Nếu sai thứ tự, các tính năng như CORS, xác thực hoặc ủy quyền có thể không hoạt động đúng. Ví dụ, bạn cần biết request đi đâu (<code>UseRouting</code>) trước khi áp dụng CORS cho endpoint đó (<code>UseCors</code>).
+        </div>
+
+        <h4>1.2.2. Middleware Pipeline (Xử lý Request thực tế)</h4>
+        <p class="section-description">
+            Sau khi ứng dụng khởi động, bất kỳ yêu cầu HTTP nào đến sẽ đi qua "đường ống" các Middleware này. Hãy cùng đi chi tiết qua từng điểm dừng:
+        </p>
+        <ul>
+            <li>
+                <strong>Client Gửi HTTP Request</strong>: Mọi chuyện bắt đầu khi một trình duyệt hoặc một ứng dụng khác gửi một yêu cầu (ví dụ: `GET /api/products`).
+            </li>
+            <li>
+                <strong>Kestrel/IIS (Server) Nhận Request</strong>: Kestrel (máy chủ web mặc định của ASP.NET Core) hoặc IIS (nếu bạn triển khai trên Windows Server) nhận yêu cầu thô này.
+            </li>
+            <li>
+                <strong>UseHttpsRedirection()</strong>:
+                <ul>
+                    <li>
+                        **Nhiệm vụ**: Nếu request đến là `http://` (không bảo mật), middleware này sẽ tự động chuyển hướng nó sang `https://` (có bảo mật).
+                    </li>
+                    <li>
+                        **Tại sao quan trọng**: Luôn sử dụng HTTPS để bảo vệ dữ liệu truyền tải giữa client và server.
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>UseRouting()</strong>:
+                <ul>
+                    <li>
+                        **Nhiệm vụ**: "Người định vị đường đi". Nó đọc URL của request và tìm ra "đích đến" cuối cùng của request đó trong ứng dụng của bạn (ví dụ: nó biết `GET /api/products` nên được xử lý bởi phương thức `GetAllProducts` trong `ProductsController`).
+                    </li>
+                    <li>
+                        **Tại sao quan trọng**: Là bước đầu tiên để hệ thống biết request này dành cho Controller/Action nào.
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>UseCors()</strong>:
+                <ul>
+                    <li>
+                        **Nhiệm vụ**: "Người kiểm soát biên giới". Sau khi `UseRouting()` đã tìm ra đích đến, `UseCors()` kiểm tra xem nguồn gốc (origin) của yêu cầu (tức là trang web gửi yêu cầu) có được phép truy cập tài nguyên này hay không dựa trên các chính sách bạn đã cấu hình.
+                    </li>
+                    <li>
+                        **Tại sao quan trọng**: Ngăn chặn các yêu cầu độc hại từ các trang web không mong muốn, bảo vệ API của bạn.
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>UseAuthentication()</strong>:
+                <ul>
+                    <li>
+                        **Nhiệm vụ**: "Người kiểm tra danh tính". Middleware này cố gắng xác định "bạn là ai". Nó kiểm tra các thông tin như token (JWT Token), cookie, hoặc thông tin đăng nhập khác để biết người dùng hiện tại là ai.
+                    </li>
+                    <li>
+                        **Tại sao quan trọng**: Để biết request được gửi bởi một người dùng hợp lệ hay không.
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>UseAuthorization()</strong>:
+                <ul>
+                    <li>
+                        **Nhiệm vụ**: "Người kiểm tra quyền". Sau khi đã xác định được "bạn là ai" (`UseAuthentication`), middleware này kiểm tra xem "bạn có quyền làm điều đó không?". Ví dụ, người dùng A có thể xem danh sách sản phẩm, nhưng chỉ người quản trị mới có thể xóa sản phẩm.
+                    </li>
+                    <li>
+                        **Tại sao quan trọng**: Đảm bảo người dùng chỉ truy cập được những gì họ được phép.
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>MapControllers()</strong>:
+                <ul>
+                    <li>
+                        **Nhiệm vụ**: "Kích hoạt hành động". Đây là bước mà hệ thống thực sự gọi đến phương thức (Action Method) trong Controller của bạn mà `UseRouting()` đã tìm thấy.
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>Action Method Thực Thi</strong>:
+                <ul>
+                    <li>
+                        **Nhiệm vụ**: Đây là nơi code nghiệp vụ của bạn chạy. Controller nhận request, xử lý dữ liệu, có thể gọi các service khác (đã được inject bởi DI container) để tương tác với database, thực hiện tính toán, v.v.
+                    </li>
+                    <li>
+                        **Kết quả**: Sau khi xử lý, Action Method sẽ trả về một kết quả, thường là dữ liệu (JSON) và một HTTP status code (ví dụ: 200 OK, 404 Not Found, 201 Created).
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>Phản hồi (Response) đi ngược lại qua Middleware</strong>: Kết quả từ Action Method sẽ đi ngược lại qua các Middleware trong pipeline (theo thứ tự ngược lại). Các Middleware này có thể thêm các header, nén dữ liệu, hoặc thực hiện các tác vụ khác trước khi phản hồi được gửi đi.
+            </li>
+            <li>
+                <strong>Phản hồi HTTP về Client</strong>: Cuối cùng, phản hồi hoàn chỉnh được gửi trở lại trình duyệt hoặc ứng dụng đã gửi yêu cầu.
+            </li>
+        </ul>
+
+        ---
+
+        <h2>Phần 2: Hướng Dẫn Chi Tiết Cách Tạo Một Web API "Fake"</h2>
+        <p class="section-description">
+            Để bạn dễ hình dung, chúng ta sẽ tạo một Web API đơn giản để quản lý "Sản phẩm" (Products) với 4 phương thức chuẩn của RESTful API: GET, POST, PUT, DELETE. API này sẽ không dùng database thực tế mà chỉ lưu dữ liệu trong bộ nhớ (một danh sách `List<Product>`) để đơn giản.
+        </p>
+
+        <h3>2.1. Cài Đặt Môi Trường</h3>
+        <p class="section-description">
+            Trước tiên, bạn cần cài đặt:
+            <ul>
+                <li><strong>.NET SDK:</strong> Tải và cài đặt từ <a href="https://dotnet.microsoft.com/download" target="_blank">trang chủ Microsoft</a>.</li>
+                <li><strong>Visual Studio Code</strong> (khuyên dùng) hoặc <strong>Visual Studio Community</strong> (bản miễn phí): Tải từ <a href="https://code.visualstudio.com/" target="_blank">trang chủ VS Code</a> hoặc <a href="https://visualstudio.microsoft.com/vs/community/" target="_blank">trang chủ Visual Studio</a>.</li>
+            </ul>
+        </p>
+
+        <h3>2.2. Tạo Project Web API Mới</h3>
+        <p class="section-description">
+            Mở **Terminal** (trên macOS/Linux) hoặc **Command Prompt/PowerShell** (trên Windows) và làm theo các bước sau:
+        </p>
+        <div class="step-by-step">
+            <div class="step">
+                <strong>Bước 1: Tạo thư mục cho dự án</strong>
+                <div class="code-block">
+                    <pre><code>mkdir MyFakeProductApi
+cd MyFakeProductApi</code></pre>
+                </div>
+            </div>
+            <div class="step">
+                <strong>Bước 2: Tạo dự án Web API</strong>
+                <p>Sử dụng lệnh sau để tạo một dự án ASP.NET Core Web API mới. Lệnh này sẽ tạo ra một cấu trúc thư mục và các file cần thiết.</p>
+                <div class="code-block">
+                    <pre><code>dotnet new webapi -n MyFakeProductApi</code></pre>
+                </div>
+                <p>Nếu bạn muốn sử dụng Controller thay vì Minimal API mặc định (từ .NET 6 trở lên), bạn có thể thêm `--no-minimal-apis`.</p>
+                <div class="code-block">
+                    <pre><code>dotnet new webapi -n MyFakeProductApi --no-minimal-apis</code></pre>
+            </div>
+            </div>
+            <div class="step">
+                <strong>Bước 3: Mở dự án trong Visual Studio Code</strong>
+                <p>Sau khi tạo, bạn có thể mở dự án bằng VS Code:</p>
+                <div class="code-block">
+                    <pre><code>code .</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <h3>2.3. Cấu Trúc Dự Án Cơ Bản</h3>
+        <p class="section-description">
+            Khi bạn mở dự án, bạn sẽ thấy các file và thư mục chính:
+            <ul>
+                <li><strong><code>Program.cs</code>:</strong> File khởi động ứng dụng (đã giải thích ở Phần 1).</li>
+                <li><strong><code>Controllers/</code>:</strong> Thư mục chứa các API Controller của bạn.</li>
+                <li><strong><code>Properties/launchSettings.json</code>:</strong> Cấu hình cách ứng dụng chạy trong môi trường phát triển (các cổng, profile).</li>
+                <li><strong><code>appsettings.json</code>:</strong> File cấu hình ứng dụng.</li>
+            </ul>
+        </p>
+
+        <h3>2.4. Tạo Model (Đối Tượng Dữ Liệu)</h3>
+        <p class="section-description">
+            Chúng ta sẽ tạo một lớp (class) `Product` để đại diện cho một sản phẩm.
+        </p>
+        <div class="step-by-step">
+            <div class="step">
+                <strong>Bước 1: Tạo thư mục <code>Models</code></strong>
+                <p>Trong thư mục gốc của dự án, tạo một thư mục mới tên là <code>Models</code>.</p>
+            </div>
+            <div class="step">
+                <strong>Bước 2: Tạo file <code>Product.cs</code></strong>
+                <p>Trong thư mục <code>Models</code>, tạo một file mới tên là <code>Product.cs</code> và thêm nội dung sau:</p>
+                <div class="code-block">
+                    <pre><code><span class="comment">// Models/Product.cs</span>
+<span class="keyword">namespace</span> MyFakeProductApi.Models
+{
+    <span class="keyword">public class</span> Product
+    {
+        <span class="keyword">public int</span> Id { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+        <span class="keyword">public string</span> Name { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="string">string</span>.Empty;
+        <span class="keyword">public decimal</span> Price { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+        <span class="keyword">public string</span> Description { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="string">string</span>.Empty;
+    }
+}
+                    </code></pre>
+                </div>
+            </div>
+        </div>
+
+        <h3>2.5. Tạo Controller (API Logic)</h3>
+        <p class="section-description">
+            Controller là nơi bạn định nghĩa các phương thức (Action Methods) sẽ xử lý các yêu cầu HTTP (GET, POST, PUT, DELETE).
+        </p>
+        <div class="step-by-step">
+            <div class="step">
+                <strong>Bước 1: Xóa Controller mặc định (tùy chọn)</strong>
+                <p>ASP.NET Core thường tạo sẵn một <code>WeatherForecastController.cs</code>. Bạn có thể xóa file này nếu muốn.</p>
+            </div>
+            <div class="step">
+                <strong>Bước 2: Tạo file <code>ProductsController.cs</code></strong>
+                <p>Trong thư mục <code>Controllers</code>, tạo một file mới tên là <code>ProductsController.cs</code> và thêm nội dung sau:</p>
+                <div class="code-block">
+                    <pre><code><span class="comment">// Controllers/ProductsController.cs</span>
+<span class="keyword">using</span> Microsoft.AspNetCore.Mvc;
+<span class="keyword">using</span> MyFakeProductApi.Models; <span class="comment">// Nhớ thêm using để sử dụng lớp Product</span>
+<span class="keyword">using</span> System.Collections.Generic;
+<span class="keyword">using</span> System.Linq;
+
+[ApiController] <span class="comment">// Đánh dấu đây là một API Controller</span>
+[Route(<span class="string">"api/[controller]"</span>)] <span class="comment">// Định nghĩa route cơ bản: /api/Products</span>
+<span class="keyword">public class</span> ProductsController : ControllerBase
+{
+    <span class="comment">// Dữ liệu "giả" lưu trong bộ nhớ. Trong ứng dụng thực, đây sẽ là database.</span>
+    <span class="keyword">private static</span> List&lt;Product&gt; _products = <span class="keyword">new</span> List&lt;Product&gt;
+    {
+        <span class="keyword">new</span> Product { Id = <span class="number">1</span>, Name = <span class="string">"Laptop XYZ"</span>, Price = <span class="number">1200m</span>, Description = <span class="string">"Powerful laptop for coding."</span> },
+        <span class="keyword">new</span> Product { Id = <span class="number">2</span>, Name = <span class="string">"Mouse Ergonomic"</span>, Price = <span class="number">25m</span>, Description = <span class="string">"Comfortable mouse for long use."</span> },
+        <span class="keyword">new</span> Product { Id = <span class="number">3</span>, Name = <span class="string">"USB-C Hub"</span>, Price = <span class="number">50m</span>, Description = <span class="string">"Multi-port adapter for modern laptops."</span> }
+    };
+
+    <span class="comment">// --- 1. GET: Lấy tất cả sản phẩm ---</span>
+    <span class="comment">// Route: GET /api/products</span>
+    [HttpGet]
+    <span class="keyword">public</span> ActionResult&lt;IEnumerable&lt;Product&gt;&gt; GetAllProducts()
+    {
+        <span class="comment">// Trả về danh sách tất cả sản phẩm với HTTP 200 OK</span>
+        <span class="keyword">return</span> Ok(_products);
+    }
+
+    <span class="comment">// --- 2. GET: Lấy sản phẩm theo ID ---</span>
+    <span class="comment">// Route: GET /api/products/{id}</span>
+    [HttpGet(<span class="string">"{id}"</span>)] <span class="comment">// {id} là tham số trong URL</span>
+    <span class="keyword">public</span> ActionResult&lt;Product&gt; GetProductById(<span class="keyword">int</span> id)
+    {
+        <span class="keyword">var</span> product = _products.FirstOrDefault(p => p.Id == id);
+        <span class="keyword">if</span> (product == <span class="keyword">null</span>)
+        {
+            <span class="comment">// Nếu không tìm thấy, trả về HTTP 404 Not Found</span>
+            <span class="keyword">return</span> NotFound();
+        }
+        <span class="comment">// Tìm thấy, trả về sản phẩm với HTTP 200 OK</span>
+        <span class="keyword">return</span> Ok(product);
+    }
+
+    <span class="comment">// --- 3. POST: Thêm sản phẩm mới ---</span>
+    <span class="comment">// Route: POST /api/products</span>
+    [HttpPost]
+    <span class="keyword">public</span> ActionResult&lt;Product&gt; CreateProduct([FromBody] Product newProduct)
+    {
+        <span class="comment">// Đặt ID mới (đơn giản, trong thực tế dùng ID tự tăng từ DB)</span>
+        newProduct.Id = _products.Any() ? _products.Max(p => p.Id) + <span class="number">1</span> : <span class="number">1</span>;
+        _products.Add(newProduct);
+        <span class="comment">// Trả về HTTP 201 Created và URL để lấy sản phẩm vừa tạo</span>
+        <span class="keyword">return</span> CreatedAtAction(nameof(GetProductById), <span class="keyword">new</span> { id = newProduct.Id }, newProduct);
+    }
+
+    <span class="comment">// --- 4. PUT: Cập nhật sản phẩm hiện có ---</span>
+    <span class="comment">// Route: PUT /api/products/{id}</span>
+    [HttpPut(<span class="string">"{id}"</span>)]
+    <span class="keyword">public</span> IActionResult UpdateProduct(<span class="keyword">int</span> id, [FromBody] Product updatedProduct)
+    {
+        <span class="keyword">if</span> (id != updatedProduct.Id)
+        {
+            <span class="comment">// ID trong URL không khớp ID trong body, trả về HTTP 400 Bad Request</span>
+            <span class="keyword">return</span> BadRequest();
+        }
+
+        <span class="keyword">var</span> existingProduct = _products.FirstOrDefault(p => p.Id == id);
+        <span class="keyword">if</span> (existingProduct == <span class="keyword">null</span>)
+        {
+            <span class="comment">// Không tìm thấy sản phẩm để cập nhật, trả về HTTP 404 Not Found</span>
+            <span class="keyword">return</span> NotFound();
+        }
+
+        <span class="comment">// Cập nhật thông tin sản phẩm</span>
+        existingProduct.Name = updatedProduct.Name;
+        existingProduct.Price = updatedProduct.Price;
+        existingProduct.Description = updatedProduct.Description;
+
+        <span class="comment">// Cập nhật thành công nhưng không cần trả về nội dung, HTTP 204 No Content</span>
+        <span class="keyword">return</span> NoContent();
+    }
+
+    <span class="comment">// --- 5. DELETE: Xóa sản phẩm ---</span>
+    <span class="comment">// Route: DELETE /api/products/{id}</span>
+    [HttpDelete(<span class="string">"{id}"</span>)]
+    <span class="keyword">public</span> IActionResult DeleteProduct(<span class="keyword">int</span> id)
+    {
+        <span class="keyword">var</span> productToRemove = _products.FirstOrDefault(p => p.Id == id);
+        <span class="keyword">if</span> (productToRemove == <span class="keyword">null</span>)
+        {
+            <span class="comment">// Không tìm thấy sản phẩm để xóa, trả về HTTP 404 Not Found</span>
+            <span class="keyword">return</span> NotFound();
+        }
+
+        _products.Remove(productToRemove);
+        <span class="comment">// Xóa thành công, HTTP 204 No Content</span>
+        <span class="keyword">return</span> NoContent();
+    }
+}
+                    </code></pre>
+                </div>
+            </div>
+        </div>
+
+        <h3>2.6. Chỉnh Sửa `Program.cs` (nếu bạn tạo `--no-minimal-apis`)</h3>
+        <p class="section-description">
+            Nếu bạn tạo project với option `--no-minimal-apis`, file <code>Program.cs</code> sẽ tương tự như mẫu ở Phần 1. Chỉ cần đảm bảo dòng <code>builder.Services.AddControllers();</code> và <code>app.MapControllers();</code> đã có sẵn.
+        </p>
+
+        <h3>2.7. Chạy Ứng Dụng API của Bạn</h3>
+        <p class="section-description">
+            Sau khi đã tạo Model và Controller, bạn có thể chạy API của mình:
+        </p>
+        <div class="step-by-step">
+            <div class="step">
+                <strong>Bước 1: Chạy từ Terminal</strong>
+                <p>Trong thư mục gốc của dự án (<code>MyFakeProductApi</code>), chạy lệnh:</p>
+                <div class="code-block">
+                    <pre><code>dotnet run</code></pre>
+                </div>
+                <p>Bạn sẽ thấy các URL mà API của bạn đang lắng nghe (thường là `http://localhost:5xxx` và `https://localhost:7xxx`).</p>
+            </div>
+            <div class="step">
+                <strong>Bước 2: Test API của bạn</strong>
+                <p>Bạn có thể sử dụng các công cụ như trình duyệt web, Postman, Insomnia, hoặc tiện ích `REST Client` của VS Code để test.</p>
+                <div class="rest-methods">
+                    <div class="method-box get">
+                        <h4>GET All Products</h4>
+                        <p><strong>URL:</strong> <code>https://localhost:7xxx/api/products</code> (thay 7xxx bằng số cổng của bạn)<br>
+                        <strong>Method:</strong> <code>GET</code><br>
+                        <strong>Kết quả mong đợi:</strong> Danh sách tất cả sản phẩm.</p>
+                    </div>
+                    <div class="method-box get">
+                        <h4>GET Product By ID</h4>
+                        <p><strong>URL:</strong> <code>https://localhost:7xxx/api/products/1</code><br>
+                        <strong>Method:</strong> <code>GET</code><br>
+                        <strong>Kết quả mong đợi:</strong> Sản phẩm có ID là 1 (hoặc 404 nếu không tìm thấy).</p>
+                    </div>
+                    <div class="method-box post">
+                        <h4>POST Create Product</h4>
+                        <p><strong>URL:</strong> <code>https://localhost:7xxx/api/products</code><br>
+                        <strong>Method:</strong> <code>POST</code><br>
+                        <strong>Header:</strong> <code>Content-Type: application/json</code><br>
+                        <strong>Body (JSON):</strong>
+                        <div class="code-block" style="background: #3a3f47; border-left: 5px solid #FFC107;">
+                            <pre><code>{
+  "name": "Mechanical Keyboard",
+  "price": 150,
+  "description": "High-quality keyboard with tactile keys."
+}</code></pre>
+                        </div>
+                        <strong>Kết quả mong đợi:</strong> HTTP 201 Created và chi tiết sản phẩm mới.</p>
+                    </div>
+                    <div class="method-box put">
+                        <h4>PUT Update Product</h4>
+                        <p><strong>URL:</strong> <code>https://localhost:7xxx/api/products/1</code><br>
+                        <strong>Method:</strong> <code>PUT</code><br>
+                        <strong>Header:</strong> <code>Content-Type: application/json</code><br>
+                        <strong>Body (JSON):</strong>
+                        <div class="code-block" style="background: #3a3f47; border-left: 5px solid #9C27B0;">
+                            <pre><code>{
+  "id": 1,
+  "name": "Laptop XYZ (Updated)",
+  "price": 1250,
+  "description": "Powerful laptop, now with better battery."
+}</code></pre>
+                        </div>
+                        <strong>Kết quả mong đợi:</strong> HTTP 204 No Content (cập nhật thành công).</p>
+                    </div>
+                    <div class="method-box delete">
+                        <h4>DELETE Product</h4>
+                        <p><strong>URL:</strong> <code>https://localhost:7xxx/api/products/1</code><br>
+                        <strong>Method:</strong> <code>DELETE</code><br>
+                        <strong>Kết quả mong đợi:</strong> HTTP 204 No Content (xóa thành công).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        ---
+
+        <h2>Phần 3: CORS (Cross-Origin Resource Sharing) và tầm quan trọng</h2>
+        <p class="section-description">
+            Như đã đề cập ở trên, CORS là một cơ chế bảo mật trình duyệt. Nếu bạn định xây dựng một ứng dụng frontend (ví dụ: dùng React, Angular, Vue) chạy trên một địa chỉ khác với API của bạn, bạn sẽ gặp lỗi CORS nếu không cấu hình đúng.
+        </p>
+        <p class="section-description">
+            **Tình huống phổ biến:**
+            <ul>
+                <li>API của bạn chạy trên `https://localhost:7000`</li>
+                <li>Frontend của bạn chạy trên `http://localhost:3000`</li>
+            </ul>
+            Khi frontend cố gắng gửi request đến API, trình duyệt sẽ chặn request đó vì chúng có "nguồn gốc" khác nhau (khác protocol, host, hoặc port). Đây là lúc CORS cần thiết.
+        </p>
+        <div class="code-block">
+            <pre><code><span class="comment">// Trong Program.cs, trong phần builder.Services</span>
+builder.Services.<span class="highlight">AddCors</span>(options =>
+{
+    options.<span class="highlight">AddDefaultPolicy</span>(
+        policy =>
+        {
+            policy.<span class="highlight">WithOrigins</span>(<span class="string">"http://localhost:3000"</span>) <span class="comment">// Thêm nguồn gốc của frontend của bạn</span>
+                  .<span class="highlight">AllowAnyHeader</span>()
+                  .<span class="highlight">AllowAnyMethod</span>();
+        });
+});
+
+<span class="comment">// ... và trong phần app.Use...()</span>
+app.<span class="highlight">UseRouting</span>();
+app.<span class="highlight">UseCors</span>(); <span class="comment">// Áp dụng chính sách CORS sau Routing</span>
+app.<span class="highlight">UseAuthorization</span>(); <span class="comment">// Các middleware khác</span>
+</code></pre>
+        </div>
+        <p class="section-description">
+            Với cấu hình trên, trình duyệt sẽ cho phép frontend của bạn (`http://localhost:3000`) gọi đến API.
+        </p>
+        <div class="note">
+            <strong>Cảnh báo Bảo mật:</strong> <br>
+            Khi triển khai lên môi trường thực (production), không nên sử dụng <code>.AllowAnyOrigin()</code>, trừ khi bạn hiểu rõ rủi ro bảo mật. Luôn chỉ định rõ ràng các <code>WithOrigins()</code> mà bạn tin tưởng.
+        </div>
+
+        <p class="section-description">
+            Chúc mừng! Bạn đã hoàn thành một tour du lịch chi tiết về vòng đời của ASP.NET Core Web API và xây dựng được API "fake" đầu tiên của mình. Hãy tiếp tục khám phá và xây dựng nhé!
+        </p>
+    </div>
+</body>
+</html>
